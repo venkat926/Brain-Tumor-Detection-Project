@@ -1,3 +1,4 @@
+# Importing necessary libraries
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,10 +8,11 @@ from skimage.feature import hog
 
 import os
 
+# Setting up paths and classes for brain tumor dataset
 path = os.listdir('brain_tumor/Training/')
 classes = {'no_tumor':0, 'pituitary_tumor':1}
 
-
+# Loading images and labels into X and Y arrays
 import cv2
 X = []
 Y = []
@@ -22,10 +24,12 @@ for cls in classes:
         X.append(img)
         Y.append(classes[cls])
         
-        
+ # Converting lists to NumPy arrays       
 X = np.array(X)
 print(X)
 Y = np.array(Y)
+
+# Reshaping the image arrays
 X_updated = X.reshape(len(X), -1)
 
 np.unique(Y)
@@ -34,9 +38,10 @@ pd.Series(Y).value_counts()
 
 X.shape, X_updated.shape
 
-
+# Visualizing an example image
 plt.imshow(X[0], cmap='gray')
 
+# Normalizing pixel values to the range [0, 1]
 X_updated = X.reshape(len(X), -1)
 X_updated.shape
 
@@ -45,6 +50,7 @@ xtrain, xtest, ytrain, ytest = train_test_split(X_updated, Y, random_state=10,
 
 xtrain.shape, xtest.shape
 
+# Normalizing pixel values to the range [0, 1]
 print(xtrain.max(), xtrain.min())
 print(xtest.max(), xtest.min())
 xtrain = xtrain/255
@@ -52,11 +58,10 @@ xtest = xtest/255
 print(xtrain.max(), xtrain.min())
 print(xtest.max(), xtest.min())
 
+# Using Principal Component Analysis (PCA) for dimensionality reduction
 from sklearn.decomposition import PCA
-
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
-
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -67,25 +72,31 @@ lg.fit(xtrain, ytrain)
 sv = SVC()
 sv.fit(xtrain, ytrain)
 
+# Displaying training and testing scores
 print("Training Score:", lg.score(xtrain, ytrain))
 print("Testing Score:", lg.score(xtest, ytest))
-
 print("Training Score:", sv.score(xtrain, ytrain))
 print("Testing Score:", sv.score(xtest,ytest))
 
+# Predicting on the test set using SVM
 pred = sv.predict(xtest)
 
+# Finding misclassified samples
 misclassified=np.where(ytest!=pred)
 misclassified
 
+# Displaying the number of misclassified samples and an example
 print("Total Misclassified Samples: ",len(misclassified[0]))
 print(pred[36],ytest[36])
 
+# Mapping class labels to meaningful names
 dec = {0:'No Tumor', 1:'Positive Tumor'}
 
+# Visualizing test images with predictions
 plt.figure(figsize=(12,8))
 p = os.listdir('brain_tumor/Testing/')
 c=1
+# No Tumor Images
 for i in os.listdir('brain_tumor/Testing/no_tumor/')[:9]:
     plt.subplot(3,3,c)
     
@@ -102,6 +113,7 @@ for i in os.listdir('brain_tumor/Testing/no_tumor/')[:9]:
 plt.figure(figsize=(12,8))
 p = os.listdir('brain_tumor/Testing/')
 c=1
+# Pituitary Tumor Images
 for i in os.listdir('brain_tumor/Testing/pituitary_tumor/')[:16]:
     plt.subplot(4,4,c)
    
@@ -116,16 +128,18 @@ for i in os.listdir('brain_tumor/Testing/pituitary_tumor/')[:16]:
     
     
     
-############################################    
-    
+############################################   
+
+# Importing necessary libraries for the GUI  
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon
 import numpy as np
 global a
 import glob, os, os.path
 
-
+# GUI Class
 class Ui_MainWindow(object):
+    # Setting up the main window
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(900,600)
@@ -334,6 +348,7 @@ class Ui_MainWindow(object):
         self.addcol.clicked.connect(self.applyingcolor)
         self.savimg.clicked.connect(self.saving)
 
+    # Translating UI elements
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Tumor Segmentation Panel"))
@@ -349,6 +364,7 @@ class Ui_MainWindow(object):
         self.savimg.setText(_translate("MainWindow", "Save Image"))
         self.titlelbl.setText(_translate("MainWindow", "Tumor Segmentation Panel"))
 
+    # Function to set and display the selected image
     def setImage(self):
         
         import cv2
@@ -396,7 +412,8 @@ class Ui_MainWindow(object):
                                       "background-color:#FF0000;\n"
                                       "width:171px;\n"
                                       "height:61px;")
-
+    
+    # Function to apply bilateral filter and display the result
     def filter1(self):
         import cv2
         import os
@@ -419,6 +436,7 @@ class Ui_MainWindow(object):
                                QtCore.Qt.KeepAspectRatio)  # Scale pixmap
         self.label_2.setPixmap(pixmap)  # Set the pixmap onto the label
 
+    # Function to apply median filter and display the result
     def filter2(self):
         import cv2
         import os
@@ -436,6 +454,7 @@ class Ui_MainWindow(object):
                                QtCore.Qt.KeepAspectRatio)  # Scale pixmap
         self.label_2.setPixmap(pixmap)  # Set the pixmap onto the label
 
+    # Function to apply Gaussian filter and display the result
     def filter3(self):
         import cv2
         import os
@@ -452,6 +471,7 @@ class Ui_MainWindow(object):
                                QtCore.Qt.KeepAspectRatio)  # Scale pixmap
         self.label_2.setPixmap(pixmap)  # Set the pixmap onto the label
 
+    # Function to apply thresholding and display the result
     def threshing(self):
         import cv2
         import os
@@ -468,7 +488,7 @@ class Ui_MainWindow(object):
                                QtCore.Qt.KeepAspectRatio)  # Scale pixmap
         self.label_2.setPixmap(pixmap)  # Set the pixmap onto the label
 
-    
+    # Function to apply dilation and display the result
     def dilation(self):
         import cv2
         import os
@@ -489,6 +509,7 @@ class Ui_MainWindow(object):
                                QtCore.Qt.KeepAspectRatio)  # Scale pixmap
         self.label_2.setPixmap(pixmap)  # Set the pixmap onto the label
     
+    # Function to apply contouring and display the result
     def contouring(self):
         import cv2
         import os
@@ -514,6 +535,7 @@ class Ui_MainWindow(object):
                                QtCore.Qt.KeepAspectRatio)  # Scale pixmap
         self.label_2.setPixmap(pixmap)  # Set the pixmap onto the label
 
+    # Function to apply color mapping and display the result
     def applyingcolor(self):
         import cv2
         import os
@@ -534,6 +556,7 @@ class Ui_MainWindow(object):
                                QtCore.Qt.KeepAspectRatio)  # Scale pixmap
         self.label_2.setPixmap(pixmap)  # Set the pixmap onto the label
 
+    # Function to save the processed image
     def saving(self):
         import cv2
         import os
@@ -575,7 +598,7 @@ class Ui_MainWindow(object):
             for f in filelist:
                 os.remove(f)
 
-
+# Running the GUI application
 if __name__ == "__main__":
     import sys
 
@@ -588,11 +611,3 @@ if __name__ == "__main__":
     sys.exit(app.exec_())
 
     
-
-
-
-
-
-
-
-
